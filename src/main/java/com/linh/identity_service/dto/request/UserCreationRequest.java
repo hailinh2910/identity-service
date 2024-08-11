@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Setter
 public class UserCreationRequest {
 
-    @Size(min = 3, message = "USERNAME_ERROR")
+    @Size(min = 3, message = "USERNAME_ERROR") // config in enum
     private String username;
     @Size(min = 8, message = "PASSWORD_ERROR")
     private String password;

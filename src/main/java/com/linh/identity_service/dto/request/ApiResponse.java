@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL) // null object will be not displayed in response
 // normalize response
 public class ApiResponse<T> {
     private int code = ErrorCode.SUCCESS.getCode();

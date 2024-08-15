@@ -1,11 +1,14 @@
 package com.linh.identity_service.exception;
 
 import com.linh.identity_service.dto.request.ApiResponse;
+import com.nimbusds.jose.JOSEException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.text.ParseException;
 
 @ControllerAdvice
 @Slf4j
@@ -15,19 +18,41 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiResponse> handleDefaultError(Exception e) {
         ErrorCode errorCode = ErrorCode.UNCATEGORIZED_ERROR;
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
-        return ResponseEntity.badRequest().body(apiResponse);
+
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build());
     }
 
     @ExceptionHandler(AppException.class)
     ResponseEntity<ApiResponse> handleAppException(AppException e) {
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(e.getErrorCode().getCode());
-        apiResponse.setMessage(e.getErrorCode().getMessage());
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .code(e.getErrorCode().getCode())
+                .message(e.getErrorCode().getMessage())
+                .build());
     }
+
+    @ExceptionHandler(ParseException.class)
+    ResponseEntity<ApiResponse> handleParseException(ParseException e) {
+        ErrorCode errorCode = ErrorCode.PARSE_ERROR;
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(JOSEException.class)
+    ResponseEntity<ApiResponse> handleParseException(JOSEException e) {
+        ErrorCode errorCode = ErrorCode.JOSEE_ERROR;
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build());
+    }
+
+
+
 
 
     // validation error
@@ -38,12 +63,12 @@ public class GlobalExceptionHandler {
 
         try {
             errorCode = ErrorCode.valueOf(enumkey);
-       }catch (IllegalArgumentException ex){
-        log.info("Invalid enum value: {}", enumkey);
-         }
-        ApiResponse apiResponse = new ApiResponse();
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
-        return ResponseEntity.badRequest().body(apiResponse);
+        } catch (IllegalArgumentException ex) {
+            log.info("Invalid enum value: {}", enumkey);
+        }
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build());
     }
 }

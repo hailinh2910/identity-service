@@ -2,7 +2,6 @@ server:
   port: 8080
   servlet:
     context-path: /identity # http://localhost:8080/identity
-
 spring:
   datasource:
     url: jdbc:mysql://localhost:3308/identity_service
@@ -13,3 +12,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+jwt:
+  signerKey: "fDwZgw2+vAe1D85fxOG+VjWofIe9UpM9g8eYyXNhdJ4ELtKxb4jiyn7uDxMXulb2"

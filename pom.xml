@@ -41,6 +41,20 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+<!--			oauth2 da  chua thu vien nay roi-->
+		<!--		<dependency>-->
+		<!--			<groupId>com.nimbusds</groupId>-->
+		<!--			<artifactId>nimbus-jose-jwt</artifactId>-->
+		<!--			<version>9.37.2</version>-->
+		<!--		</dependency>-->
+
+
+
+
 			<!-- validation dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -51,11 +65,7 @@
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>com.nimbusds</groupId>
-			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>9.37.2</version>
-		</dependency>
+
 
 		<dependency>
 			<groupId>com.mysql</groupId>

@@ -21,6 +21,13 @@ public class UserController {
 
     UserService userService;
 
+    @GetMapping("/my-info")
+    ApiResponse<UserResponse> getMyInfo() {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.myInfo())
+                .build();
+    }
+
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         return  ApiResponse.<UserResponse>builder()

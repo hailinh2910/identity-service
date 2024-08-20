@@ -14,16 +14,16 @@ import java.text.ParseException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    //default exception
-    @ExceptionHandler(Exception.class)
-    ResponseEntity<ApiResponse> handleDefaultError(Exception e) {
-        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_ERROR;
-
-        return ResponseEntity.badRequest().body(ApiResponse.builder()
-                .code(errorCode.getCode())
-                .message(errorCode.getMessage())
-                .build());
-    }
+//    //default exception
+//    @ExceptionHandler(Exception.class)
+//    ResponseEntity<ApiResponse> handleDefaultError(Exception e) {
+//        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_ERROR;
+//
+//        return ResponseEntity.badRequest().body(ApiResponse.builder()
+//                .code(errorCode.getCode())
+//                .message(errorCode.getMessage())
+//                .build());
+//    }
 
     @ExceptionHandler(AppException.class)
     ResponseEntity<ApiResponse> handleAppException(AppException e) {

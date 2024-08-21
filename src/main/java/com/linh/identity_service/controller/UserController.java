@@ -35,8 +35,10 @@ public class UserController {
                 .build();
     }
     @GetMapping
-    List<UserResponse> getAllUsers() {
-        return userService.getAllUsers();
+    ApiResponse<List<UserResponse>> getAllUsers() {
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getAllUsers())
+                .build();
     }
     @GetMapping("/{userId}")
     UserResponse getUserById(@PathVariable("userId") String userId) {

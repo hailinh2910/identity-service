@@ -43,7 +43,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         Set<String> roles = new HashSet<>();
         roles.add(Role.USER.name());
-        user.setRoles(roles);
+    //    user.setRoles(roles);
 
         return userMapper.toUserResponse(userRepository.save(user));
 
@@ -78,10 +78,10 @@ public class UserService {
         auth.getAuthorities().forEach( a -> log.info(a.getAuthority()));
 
         return userMapper.toUserResponse
-                (userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
+                (userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
     public UserResponse updateUser(String userId, UserUpdateRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         userMapper.updateUser(user,request);
         return  userMapper.toUserResponse(userRepository.save(user));
     }
@@ -92,7 +92,7 @@ public class UserService {
     public UserResponse myInfo(){
         var context = SecurityContextHolder.getContext();
         String username = context.getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return userMapper.toUserResponse(user);
     }
 }

@@ -4,6 +4,7 @@ import com.linh.identity_service.dto.request.ApiResponse;
 import com.nimbusds.jose.JOSEException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,29 +15,51 @@ import java.text.ParseException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-//    //default exception
-//    @ExceptionHandler(Exception.class)
-//    ResponseEntity<ApiResponse> handleDefaultError(Exception e) {
-//        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_ERROR;
-//
-//        return ResponseEntity.badRequest().body(ApiResponse.builder()
-//                .code(errorCode.getCode())
-//                .message(errorCode.getMessage())
-//                .build());
-//    }
+    //default exception
+    @ExceptionHandler(Exception.class)
+    ResponseEntity<ApiResponse> handleDefaultError(Exception e) {
+        ErrorCode errorCode = ErrorCode.UNCATEGORIZED_ERROR;
+
+
+        return ResponseEntity
+                .status(errorCode.getHttpStatusCode())
+                .body(ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build());
+    }
 
     @ExceptionHandler(AppException.class)
     ResponseEntity<ApiResponse> handleAppException(AppException e) {
-        return ResponseEntity.badRequest().body(ApiResponse.builder()
+        return ResponseEntity
+                .status(e.getErrorCode().getHttpStatusCode())
+                .body(ApiResponse.builder()
                 .code(e.getErrorCode().getCode())
                 .message(e.getErrorCode().getMessage())
                 .build());
     }
 
+    @ExceptionHandler(value = AccessDeniedException.class)
+    ResponseEntity<ApiResponse> handlingAccessDeniedException(AccessDeniedException exception) {
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+
+        return ResponseEntity.status(errorCode.getHttpStatusCode())
+                .body(ApiResponse.builder()
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build());
+    }
+
+
+
+
+
     @ExceptionHandler(ParseException.class)
     ResponseEntity<ApiResponse> handleParseException(ParseException e) {
         ErrorCode errorCode = ErrorCode.PARSE_ERROR;
-        return ResponseEntity.badRequest().body(ApiResponse.builder()
+        return ResponseEntity
+                .status(errorCode.getHttpStatusCode())
+                .body(ApiResponse.builder()
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build());
@@ -45,7 +68,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JOSEException.class)
     ResponseEntity<ApiResponse> handleParseException(JOSEException e) {
         ErrorCode errorCode = ErrorCode.JOSEE_ERROR;
-        return ResponseEntity.badRequest().body(ApiResponse.builder()
+        return ResponseEntity
+                .status(errorCode.getHttpStatusCode())
+                .body(ApiResponse.builder()
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build());
@@ -66,7 +91,9 @@ public class GlobalExceptionHandler {
         } catch (IllegalArgumentException ex) {
             log.info("Invalid enum value: {}", enumkey);
         }
-        return ResponseEntity.badRequest().body(ApiResponse.builder()
+        return ResponseEntity
+                .status(errorCode.getHttpStatusCode())
+                .body(ApiResponse.builder()
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build());

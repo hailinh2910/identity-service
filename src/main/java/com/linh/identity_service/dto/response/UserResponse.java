@@ -1,5 +1,6 @@
 package com.linh.identity_service.dto.response;
 
+import com.linh.identity_service.entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,5 +15,5 @@ public class UserResponse {
     private String firstName;
     private String lastName;
     private LocalDate dob;
-    private Set<String> roles;
+    private Set<Role> roles;
 }

@@ -23,9 +23,11 @@ public class User {
     private String lastName;
     private LocalDate dob;
 
-    @ElementCollection
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
-    private Set<String> roles;
-
+    @ManyToMany
+    private Set<Role> roles;
+    
+//    @ElementCollection
+//    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+//    @Column(name = "role")
+//    private Set<String> roles;
 }

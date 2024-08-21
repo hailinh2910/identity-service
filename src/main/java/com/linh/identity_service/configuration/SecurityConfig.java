@@ -1,6 +1,7 @@
 package com.linh.identity_service.configuration;
 
 import com.linh.identity_service.enums.Role;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,10 +24,12 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity //  co the phan quyen tren method
+@RequiredArgsConstructor
 public class SecurityConfig {
 
 
     private final String[] PUBLIC_ENDPOINTS = {"/users","/auth/token","/auth/introspect"};
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -44,8 +47,10 @@ public class SecurityConfig {
         //oauth2: xu ly, giai ma token
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(jwtDecoder())
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                ));
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+
+        );
 
 
         return httpSecurity.build();

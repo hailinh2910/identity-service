@@ -43,9 +43,13 @@ public class AuthenticationService {
 
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
+
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+
+
 
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
@@ -58,7 +62,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    public IntrospectResponse introspect(IntrospectRequest introspectRequest){
+    public IntrospectResponse introspect(IntrospectRequest introspectRequest) {
 
         try {
             JWSObject jwsObject = JWSObject.parse(introspectRequest.getToken());
@@ -67,7 +71,7 @@ public class AuthenticationService {
 
             JWTClaimsSet claims = JWTClaimsSet.parse(jwsObject.getPayload().toJSONObject());
 
-            boolean verify =   jwsObject.verify(verifier)
+            boolean verify = jwsObject.verify(verifier)
                     && new Date().before(claims.getExpirationTime());
             log.info(String.valueOf(verify));
             return IntrospectResponse.builder()
@@ -92,7 +96,7 @@ public class AuthenticationService {
                 .issuer("hailinh")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
-                .claim("scope",buildScope(user))
+                .claim("scope", buildScope(user))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
@@ -111,9 +115,24 @@ public class AuthenticationService {
 
     private String buildScope(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!CollectionUtils.isEmpty(user.getRoles())) {
-        //    user.getRoles().forEach(stringJoiner::add);
+
+        if (!CollectionUtils.isEmpty(user.getRoles())) {
+            user.getRoles().forEach(role -> {
+
+                        stringJoiner.add("ROLE_"+role.getName());
+                        if (!CollectionUtils.isEmpty(role.getPermissions())) {
+                            role.getPermissions().forEach(permission -> {
+                                stringJoiner.add(permission.getName());
+                            });
+                        }
+
+                        ;
+                    }
+
+
+            );
         }
+        ;
         return stringJoiner.toString();
     }
 }

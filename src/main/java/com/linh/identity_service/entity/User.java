@@ -25,7 +25,7 @@ public class User {
 
     @ManyToMany
     private Set<Role> roles;
-    
+
 //    @ElementCollection
 //    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
 //    @Column(name = "role")

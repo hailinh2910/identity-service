@@ -8,11 +8,13 @@ import org.springframework.http.HttpStatusCode;
 public enum ErrorCode {
     SUCCESS(1000, "Success", HttpStatus.OK),
     USER_EXISTED(1001, "User existed",HttpStatus.BAD_REQUEST),
-    USERNAME_ERROR(1002, "Username must be at least 3 characters",HttpStatus.BAD_REQUEST),
-    PASSWORD_ERROR(1003, "Password must be at least 8 characters",HttpStatus.BAD_REQUEST),
+    USERNAME_ERROR(1002, "Username must be at least {min} characters",HttpStatus.BAD_REQUEST),
+    PASSWORD_ERROR(1003, "Password must be at least {min} characters",HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1004, "User not existed",HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1005, "Unauthenticated",HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1007, "You do not have permission", HttpStatus.FORBIDDEN),
+    ROLE_NOT_FOUND(1008, "Role not found", HttpStatus.NOT_FOUND),
+    INVALID_AGE(1009, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
 
     JOSEE_ERROR(9996, "JOSE Exception",HttpStatus.BAD_REQUEST),
     PARSE_ERROR(9997, "Parse Exception",HttpStatus.BAD_REQUEST),

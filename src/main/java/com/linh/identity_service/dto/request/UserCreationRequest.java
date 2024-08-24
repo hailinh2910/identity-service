@@ -1,5 +1,6 @@
 package com.linh.identity_service.dto.request;
 
+import com.linh.identity_service.validator.DobConstraint;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,5 +16,6 @@ public class UserCreationRequest {
     private String password;
     private String firstName;
     private String lastName;
+    @DobConstraint(min = 18,message = "INVALID_AGE")
     private LocalDate dob;
 }

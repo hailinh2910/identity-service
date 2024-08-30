@@ -2,6 +2,7 @@ package com.linh.identity_service.configuration;
 
 import com.linh.identity_service.enums.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +29,9 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
 
 
-    private final String[] PUBLIC_ENDPOINTS = {"/users","/auth/token","/auth/introspect"};
+    private final String[] PUBLIC_ENDPOINTS = {"/users","/auth/token","/auth/introspect", "/auth/logout"};
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -46,7 +48,7 @@ public class SecurityConfig {
 
         //oauth2: xu ly, giai ma token
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer ->
-                        jwtConfigurer.decoder(jwtDecoder())
+                        jwtConfigurer.decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
 
@@ -59,7 +61,7 @@ public class SecurityConfig {
     @Value("${jwt.signerKey}")
     private String signerKey;
     @Bean
-    JwtDecoder jwtDecoder() {
+    JwtDecoder jwtDecoder() { //verify
 
         SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
         NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder

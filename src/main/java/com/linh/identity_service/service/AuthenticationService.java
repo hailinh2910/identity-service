@@ -2,11 +2,14 @@ package com.linh.identity_service.service;
 
 import com.linh.identity_service.dto.request.AuthenticationRequest;
 import com.linh.identity_service.dto.request.IntrospectRequest;
+import com.linh.identity_service.dto.request.LogoutRequest;
 import com.linh.identity_service.dto.response.AuthenticationResponse;
 import com.linh.identity_service.dto.response.IntrospectResponse;
+import com.linh.identity_service.entity.InvalidatedToken;
 import com.linh.identity_service.entity.User;
 import com.linh.identity_service.exception.AppException;
 import com.linh.identity_service.exception.ErrorCode;
+import com.linh.identity_service.repository.InvalidatedTokenRepository;
 import com.linh.identity_service.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -19,6 +22,7 @@ import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -28,6 +32,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,15 +47,14 @@ public class AuthenticationService {
     private String SIGNER_KEY;
 
     UserRepository userRepository;
-    PasswordEncoder passwordEncoder;
+   // PasswordEncoder passwordEncoder;
+   // circular securityConfig need passwordEncoder to init but -> customJwtdecoder -> AuthenticationService -> passwordEncoder
+    InvalidatedTokenRepository invalidatedTokenRepository;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-
-
-
-
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
         if (!authenticated) {
@@ -62,31 +66,48 @@ public class AuthenticationService {
                 .build();
     }
 
-    public IntrospectResponse introspect(IntrospectRequest introspectRequest) {
+    public IntrospectResponse introspect(IntrospectRequest introspectRequest)
+            throws JOSEException, ParseException{
+        boolean isValid = true;
 
         try {
-            JWSObject jwsObject = JWSObject.parse(introspectRequest.getToken());
-
-            JWSVerifier verifier = new MACVerifier(SIGNER_KEY);
-
-            JWTClaimsSet claims = JWTClaimsSet.parse(jwsObject.getPayload().toJSONObject());
-
-            boolean verify = jwsObject.verify(verifier)
-                    && new Date().before(claims.getExpirationTime());
-            log.info(String.valueOf(verify));
-            return IntrospectResponse.builder()
-                    .valid(verify)
-                    .build();
-
-        } catch (ParseException | JOSEException e) {
-            return IntrospectResponse.builder()
-                    .valid(false)
-                    .build();
+         verifyToken(introspectRequest.getToken());
+        } catch (AppException e) {
+            isValid = false;
         }
-
+        return IntrospectResponse.builder()
+                .valid(isValid)
+                .build();
 
     }
+    private JWSObject verifyToken(String token) throws JOSEException, ParseException {
 
+         JWSObject jwsObject = JWSObject.parse(token);
+
+         JWSVerifier verifier = new MACVerifier(SIGNER_KEY);
+
+         JWTClaimsSet claims = JWTClaimsSet.parse(jwsObject.getPayload().toJSONObject());
+
+
+
+         boolean verify = jwsObject.verify(verifier)
+                 && new Date().before(claims.getExpirationTime());
+
+         if(!verify) throw  new AppException(ErrorCode.UNAUTHENTICATED);
+         boolean isExisted = invalidatedTokenRepository.existsById(claims.getJWTID());
+        if(isExisted) throw  new AppException(ErrorCode.UNAUTHENTICATED);
+
+        return jwsObject;
+    }
+    public void logout(LogoutRequest logoutRequest) throws ParseException, JOSEException {
+        JWSObject jwsObject = verifyToken(logoutRequest.getToken());
+        JWTClaimsSet claimsSet = JWTClaimsSet.parse(jwsObject.getPayload().toJSONObject());
+        String jti = claimsSet.getJWTID();
+        Date expiryTime = claimsSet.getExpirationTime();
+
+        invalidatedTokenRepository.save(InvalidatedToken.builder().id(jti).expiryTime(expiryTime).build());
+
+    }
 
     private String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512); // header
@@ -96,6 +117,7 @@ public class AuthenticationService {
                 .issuer("hailinh")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

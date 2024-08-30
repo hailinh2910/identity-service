@@ -1,10 +1,12 @@
 package com.linh.identity_service.dto.request;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class IntrospectRequest {
     private String token;
 }

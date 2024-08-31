@@ -1,9 +1,6 @@
 package com.linh.identity_service.controller;
 
-import com.linh.identity_service.dto.request.ApiResponse;
-import com.linh.identity_service.dto.request.AuthenticationRequest;
-import com.linh.identity_service.dto.request.IntrospectRequest;
-import com.linh.identity_service.dto.request.LogoutRequest;
+import com.linh.identity_service.dto.request.*;
 import com.linh.identity_service.dto.response.AuthenticationResponse;
 import com.linh.identity_service.dto.response.IntrospectResponse;
 import com.linh.identity_service.service.AuthenticationService;
@@ -44,6 +41,15 @@ public class AuthenticationController {
                 .result(introspectResponse)
                 .build();
     }
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest) throws ParseException, JOSEException {
+
+        AuthenticationResponse authenticationResponse = authenticationService.refreshToken(refreshTokenRequest);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(authenticationResponse)
+                .build();
+    }
+
     @PostMapping("/logout")
     ApiResponse<Void> logout(@RequestBody LogoutRequest logoutRequest) throws ParseException, JOSEException {
         authenticationService.logout(logoutRequest);

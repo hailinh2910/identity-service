@@ -29,7 +29,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
 
 
-    private final String[] PUBLIC_ENDPOINTS = {"/users","/auth/token","/auth/introspect", "/auth/logout"};
+    private final String[] PUBLIC_ENDPOINTS = {"/users","/auth/token","/auth/introspect", "/auth/logout","/auth/refresh"};
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final CustomJwtDecoder customJwtDecoder;
 
@@ -50,6 +50,8 @@ public class SecurityConfig {
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                // authenticationEntryPoint handles when the user does not provide a JWT,
+                // the JWT is incorrect, the JWT is expired or does not have permission
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
 
         );

@@ -34,6 +34,7 @@ public class CustomJwtDecoder implements JwtDecoder {
             if(!isValid.isValid()){
                 throw new BadJwtException("invalid token by expiry time or existed!");
             }
+           //JwtException occurs in filter so it can't be caught be GlobalExceptionHandler
         } catch (JOSEException | ParseException e) {
             throw new JwtException(e.getMessage());
         }

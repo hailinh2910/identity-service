@@ -1,6 +1,7 @@
 package com.linh.identity_service.dto.response;
 
 import com.linh.identity_service.entity.Role;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@Builder
 public class UserResponse {
     private String id;
     private String username;

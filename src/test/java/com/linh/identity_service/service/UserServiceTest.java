@@ -2,6 +2,7 @@ package com.linh.identity_service.service;
 
 import com.linh.identity_service.dto.request.UserCreationRequest;
 import com.linh.identity_service.dto.response.UserResponse;
+import com.linh.identity_service.entity.Role;
 import com.linh.identity_service.entity.User;
 import com.linh.identity_service.exception.AppException;
 import com.linh.identity_service.repository.RoleRepository;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -21,6 +23,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@TestPropertySource("/test.properties")
 public class UserServiceTest {
 
     @Autowired
@@ -37,6 +40,7 @@ public class UserServiceTest {
     private UserCreationRequest userCreationRequest;
     private UserResponse userResponse;
     private User user;
+    private Role role;
 
     private LocalDate dob;
     @BeforeEach
@@ -49,13 +53,13 @@ public class UserServiceTest {
                 .password("12345678")
                 .dob(dob)
                 .build();
-//        userResponse  = UserResponse.builder()
-//                .id("cf321032132")
-//                .username("john")
-//                .firstName("John")
-//                .lastName("Doe")
-//                .dob(dob)
-//                .build();
+        userResponse  = UserResponse.builder()
+                .id("cf321032132")
+                .username("john")
+                .firstName("John")
+                .lastName("Doe")
+                .dob(dob)
+                .build();
 
         user = User.builder()
                 .id("cf321032132")
@@ -65,6 +69,8 @@ public class UserServiceTest {
                 .dob(dob)
                 .build();
 
+        role = Role.builder()
+                .build();
     }
 
 
@@ -73,7 +79,7 @@ public class UserServiceTest {
          //GIVEN
         when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userRepository.save(any())).thenReturn(user);
-
+        when(roleRepository.findById(any())).thenReturn(Optional.ofNullable(role));
 
         //WHEN
         UserResponse userResponse = userService.createUser(userCreationRequest);

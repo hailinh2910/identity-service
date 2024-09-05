@@ -7,8 +7,4 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest
 class IdentityServiceApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
 }

@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,20 +42,21 @@ public class UserService {
 
 
     public UserResponse createUser(UserCreationRequest request) {
+        User user = userMapper.toUser(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        if(userRepository.existsByUsername(request.getUsername())){
+        HashSet<Role> roles = new HashSet<>();
+        roleRepository.findById("USER").ifPresent(roles::add);
+
+        user.setRoles(roles);
+
+        try {
+            user = userRepository.save(user);
+        } catch (DataIntegrityViolationException exception) {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
-        User user = userMapper.toUser(request);
 
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        Role role = roleRepository.findById("USER").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
-        Set<Role> roles = new HashSet<>();
-        roles.add(role);
-        user.setRoles(roles);
-        user = userRepository.save(user);
         return userMapper.toUserResponse(user);
-
     }
 //    @PreAuthorize("hasRole('ADMIN') and hasRole('MANAGER')")
 //@PostAuthorize("principal.claims['user_id'] == 'userId'") user_id is name of claims

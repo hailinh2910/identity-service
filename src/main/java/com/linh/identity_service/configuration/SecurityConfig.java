@@ -63,10 +63,9 @@ public class SecurityConfig {
     JwtDecoder jwtDecoder() { // verify
 
         SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-        NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec)
+        return NimbusJwtDecoder.withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS512)
                 .build();
-        return nimbusJwtDecoder;
     }
 
     // dung de convert lai, vd: thay vi scope thi config lai thanh role...

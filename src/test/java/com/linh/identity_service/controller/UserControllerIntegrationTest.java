@@ -1,12 +1,7 @@
 package com.linh.identity_service.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.linh.identity_service.dto.request.UserCreationRequest;
-import com.linh.identity_service.dto.response.UserResponse;
-import com.linh.identity_service.entity.Role;
-import com.linh.identity_service.repository.RoleRepository;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +17,21 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.linh.identity_service.dto.request.UserCreationRequest;
+import com.linh.identity_service.dto.response.UserResponse;
+import com.linh.identity_service.entity.Role;
+import com.linh.identity_service.repository.RoleRepository;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc
 @Testcontainers
 public class UserControllerIntegrationTest {
-  // ERROR
+    // ERROR
     @Container
     static final MySQLContainer<?> mysqlContainer = new MySQLContainer<>("mysql:latest");
 
@@ -47,6 +46,7 @@ public class UserControllerIntegrationTest {
 
     @Autowired
     private RoleRepository roleRepository;
+
     @Autowired
     private MockMvc mockMvc;
 

@@ -1,46 +1,45 @@
 package com.linh.identity_service.exception;
 
-import com.linh.identity_service.dto.request.ApiResponse;
-import com.nimbusds.jose.JOSEException;
+import java.text.ParseException;
+import java.util.Map;
+import java.util.Objects;
+
 import jakarta.validation.ConstraintViolation;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import com.linh.identity_service.dto.request.ApiResponse;
+import com.nimbusds.jose.JOSEException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
-    //default exception
+    // default exception
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiResponse> handleDefaultError(Exception e) {
         ErrorCode errorCode = ErrorCode.UNCATEGORIZED_ERROR;
 
-
-        return ResponseEntity
-                .status(errorCode.getHttpStatusCode())
+        return ResponseEntity.status(errorCode.getHttpStatusCode())
                 .body(ApiResponse.builder()
-                .code(errorCode.getCode())
-                .message(errorCode.getMessage())
-                .build());
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build());
     }
 
     @ExceptionHandler(AppException.class)
     ResponseEntity<ApiResponse> handleAppException(AppException e) {
-        return ResponseEntity
-                .status(e.getErrorCode().getHttpStatusCode())
+        return ResponseEntity.status(e.getErrorCode().getHttpStatusCode())
                 .body(ApiResponse.builder()
-                .code(e.getErrorCode().getCode())
-                .message(e.getErrorCode().getMessage())
-                .build());
+                        .code(e.getErrorCode().getCode())
+                        .message(e.getErrorCode().getMessage())
+                        .build());
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
@@ -54,34 +53,25 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
-
-
-
-
     @ExceptionHandler(ParseException.class)
     ResponseEntity<ApiResponse> handleParseException(ParseException e) {
         ErrorCode errorCode = ErrorCode.PARSE_ERROR;
-        return ResponseEntity
-                .status(errorCode.getHttpStatusCode())
+        return ResponseEntity.status(errorCode.getHttpStatusCode())
                 .body(ApiResponse.builder()
-                .code(errorCode.getCode())
-                .message(errorCode.getMessage())
-                .build());
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build());
     }
 
     @ExceptionHandler(JOSEException.class)
     ResponseEntity<ApiResponse> handleParseException(JOSEException e) {
         ErrorCode errorCode = ErrorCode.JOSEE_ERROR;
-        return ResponseEntity
-                .status(errorCode.getHttpStatusCode())
+        return ResponseEntity.status(errorCode.getHttpStatusCode())
                 .body(ApiResponse.builder()
-                .code(errorCode.getCode())
-                .message(errorCode.getMessage())
-                .build());
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build());
     }
-
-
-
 
     private final String MIN_VALIDATION = "min";
     // validation error
@@ -94,26 +84,27 @@ public class GlobalExceptionHandler {
 
         try {
             errorCode = ErrorCode.valueOf(enumkey);
-            ConstraintViolation constraintViolation = e.getBindingResult()
-                    .getAllErrors().getFirst().unwrap(ConstraintViolation.class);
+            ConstraintViolation constraintViolation =
+                    e.getBindingResult().getAllErrors().getFirst().unwrap(ConstraintViolation.class);
             attributes = constraintViolation.getConstraintDescriptor().getAttributes();
 
         } catch (IllegalArgumentException ex) {
             log.info("Invalid enum value: {}", enumkey);
         }
-        return ResponseEntity
-                .status(errorCode.getHttpStatusCode())
+        return ResponseEntity.status(errorCode.getHttpStatusCode())
                 .body(ApiResponse.builder()
-                .code(errorCode.getCode())
-                .message( Objects.nonNull(attributes) ?
-                        replace(errorCode.getMessage(), attributes.get(MIN_VALIDATION).toString())
-                        : errorCode.getMessage())
-
-                .build());
+                        .code(errorCode.getCode())
+                        .message(
+                                Objects.nonNull(attributes)
+                                        ? replace(
+                                                errorCode.getMessage(),
+                                                attributes.get(MIN_VALIDATION).toString())
+                                        : errorCode.getMessage())
+                        .build());
     }
 
-    private String replace(String message, String value){
+    private String replace(String message, String value) {
 
-        return message.replace("{" + MIN_VALIDATION +"}" , value);
+        return message.replace("{" + MIN_VALIDATION + "}", value);
     }
 }

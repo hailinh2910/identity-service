@@ -1,21 +1,18 @@
 package com.linh.identity_service.validator;
 
+import java.lang.annotation.*;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-import java.lang.annotation.*;
-
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(
-        validatedBy = {DobValidator.class}
-)
-//custom validation, ex: 18+ age
+@Constraint(validatedBy = {DobValidator.class})
+// custom validation, ex: 18+ age
 public @interface DobConstraint {
     String message();
 
     int min();
-
 
     Class<?>[] groups() default {};
 

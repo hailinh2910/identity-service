@@ -1,12 +1,11 @@
 package com.linh.identity_service.dto.response;
 
-import com.linh.identity_service.entity.Role;
+import java.time.LocalDate;
+import java.util.Set;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDate;
-import java.util.Set;
 
 @Getter
 @Setter

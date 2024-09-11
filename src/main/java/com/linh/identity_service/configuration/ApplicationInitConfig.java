@@ -30,18 +30,21 @@ public class ApplicationInitConfig {
     private final PermissionRepository permissionRepository;
 
     @Bean
-    @ConditionalOnProperty(
+    @ConditionalOnProperty( // chưa   save role  init bị lỗi
             prefix = "spring",
             name = "datasource.driver-class-name",
             havingValue = "com.mysql.cj.jdbc.Driver")
     ApplicationRunner applicationRunner(UserRepository userRepository) {
+        log.info("Initializing application.....");
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()) {
+                roleRepository.save(
+                        Role.builder().name("USER").description("User role").build());
+
+                Role adminRole = roleRepository.save(
+                        Role.builder().name("ADMIN").description("Admin role").build());
+
                 Set<Role> roles = new HashSet<>();
-                Role adminRole = new Role();
-                // khi set khóa chính. thay vì new thì JPA/Hibernate will auto check if primary key already
-                // existed then get this entity
-                adminRole.setName("ADMIN"); // ADMIN role da ton tai, -> lay ra object Role trong Database
                 roles.add(adminRole);
 
                 User user = User.builder()

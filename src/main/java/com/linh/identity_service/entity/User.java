@@ -19,7 +19,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(
+            name = "username",
+            unique = true,
+            nullable = false,
+            columnDefinition = "VARCHAR(255) COLLATE utf8mb4_general_ci")
     private String username;
+
     private String password;
     private String firstName;
     private String lastName;

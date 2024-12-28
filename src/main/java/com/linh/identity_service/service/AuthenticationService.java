@@ -54,7 +54,7 @@ public class AuthenticationService {
 
     @NonFinal
     @Value("${jwt.refreshable-duration}")
-    private long REFRESHABLE_DURATION;
+        private long REFRESHABLE_DURATION;
 
     UserRepository userRepository;
     // PasswordEncoder passwordEncoder;

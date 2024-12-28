@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.linh.identity_service.dto.request.UserCreationRequest;
 import com.linh.identity_service.dto.response.UserResponse;
-import com.linh.identity_service.repository.RoleRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,8 +44,7 @@ public class UserControllerIntegrationTest {
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
     }
 
-    @Autowired
-    private RoleRepository roleRepository;
+
 
     @Autowired
     private MockMvc mockMvc;
